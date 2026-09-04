@@ -7,6 +7,7 @@ const {
   getCurrentUser,
   logoutUser,
 } = require('../controllers/authController');
+
 const protect = require('../middleware/authMiddleware');
 const validateRequest = require('../middleware/validateRequest');
 
@@ -16,13 +17,16 @@ const router = express.Router();
 router.post(
   '/register',
   [
-    // Validate name field.
-    body('name').trim().notEmpty().withMessage('Name is required'),
+    body('name')
+      .trim()
+      .notEmpty()
+      .withMessage('Name is required'),
 
-    // Validate email format.
-    body('email').isEmail().withMessage('Valid email is required').normalizeEmail(),
+    body('email')
+      .isEmail()
+      .withMessage('Valid email is required')
+      .normalizeEmail(),
 
-    // Password must be at least 6 chars.
     body('password')
       .isLength({ min: 6 })
       .withMessage('Password must be at least 6 characters'),
@@ -35,22 +39,31 @@ router.post(
 router.post(
   '/login',
   [
-    // Email is required and should be valid.
-    body('email').isEmail().withMessage('Valid email is required').normalizeEmail(),
+    body('email')
+      .isEmail()
+      .withMessage('Valid email is required')
+      .normalizeEmail(),
 
-    // Password is required.
-    body('password').notEmpty().withMessage('Password is required'),
+    body('password')
+      .notEmpty()
+      .withMessage('Password is required'),
   ],
   validateRequest,
   loginUser
 );
 
 // GET /api/auth/me
-// Protected route to get currently logged-in user profile.
-router.get('/me', protect, getCurrentUser);
+router.get(
+  '/me',
+  protect,
+  getCurrentUser
+);
 
 // POST /api/auth/logout
-// Protected route because only logged-in user should logout token session.
-router.post('/logout', protect, logoutUser);
+router.post(
+  '/logout',
+  protect,
+  logoutUser
+);
 
 module.exports = router;
